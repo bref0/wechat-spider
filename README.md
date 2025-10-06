@@ -1,62 +1,51 @@
-# 微信公众号爬虫 - Node.js TypeScript 版本
+# 微信公众号爬虫 - Node.js 版本
 
-基于 TypeScript 的微信公众号文章爬虫工具,支持本地文件存储和数据库存储两种模式。
+基于 Node.js + TypeScript 的微信公众号文章爬虫工具,**零基础友好**,只需 `pnpm dev` 一个命令即可使用!
 
 ## ✨ 特性
 
-- 🚀 **TypeScript** - 完整的类型安全
-- 🎭 **Playwright** - 自动登录微信公众平台
-- 📁 **双存储模式** - 本地文件 + 数据库(SQLite)
-- 🖼️ **媒体下载** - 自动下载图片和视频到本地
-- 📝 **Markdown 转换** - 支持 HTML → Markdown
-- ⚙️ **灵活配置** - JSON5 配置(支持注释) + 环境变量
-- 🔄 **并发控制** - 防止被封禁
-- 📊 **CSV 导出** - 兼容 Python 版本格式
+- 🎯 **零门槛** - 交互式菜单,无需学习命令行
+- 🚀 **现代技术栈** - Node.js + TypeScript + pnpm
+- 🎭 **自动登录** - Playwright 自动化浏览器登录
+- 💾 **灵活存储** - 本地文件 + 数据库双模式
+- 🖼️ **媒体下载** - 自动下载图片和视频
+- 📝 **格式转换** - 支持 HTML → Markdown
+- ⚙️ **简单配置** - 引导式配置,支持注释
 
-## 📦 安装
+## 📦 快速安装
 
-### 方式一: 一键安装 (推荐,支持所有系统)
+### 环境要求
+
+- **Node.js** 16+ (推荐 18+)
+- **pnpm** (自动安装)
+
+### 三步启动
 
 ```bash
-# 克隆项目
+# 1. 克隆项目
 git clone <项目地址>
 cd wechat-spider-node
 
-# 安装 pnpm (如果未安装)
+# 2. 安装 pnpm (如果未安装)
 npm install -g pnpm
 
-# 一键初始化 (自动安装依赖、生成数据库、检查配置)
-pnpm setup
+# 3. 一键初始化并启动
+pnpm setup && pnpm dev
 ```
 
-**支持系统:** ✅ Windows | ✅ macOS | ✅ Linux
+就这么简单! 🎉
 
-**说明:** config.json 已包含在仓库中(带完整注释),无需手动创建!
+**支持系统:** ✅ Windows | ✅ macOS (已测试) | ✅ Linux
 
-### 方式二: 手动安装
+## 🚀 开始使用
 
-```bash
-# 安装依赖
-pnpm install
-
-# 初始化数据库
-pnpm db:generate
-
-# 复制 .env 文件 (可选)
-cp .env.example .env              # Windows: copy .env.example .env
-```
-
-## 🚀 快速开始
-
-### 方式一: 交互式菜单 (推荐新手)
-
-直接运行主程序,通过菜单选择操作:
+### 一行命令启动交互式菜单
 
 ```bash
 pnpm dev
 ```
 
-会出现交互式菜单:
+会出现友好的交互式菜单:
 
 ```
 🚀 欢迎使用微信公众号爬虫工具
@@ -69,207 +58,179 @@ pnpm dev
   ❌ 退出
 ```
 
-#### 1. 配置向导
+### 使用流程
 
-选择 `配置向导` 后会引导你完成所有配置项(存储模式、媒体下载、爬虫参数等),自动生成 `config.json`。
+#### 第一步: 配置向导 ⚙️
 
-#### 2. 登录
+首次使用选择 `配置向导`,会引导你完成:
+- 选择存储模式(本地文件/数据库/双模式)
+- 是否下载图片和视频
+- 设置爬取参数(间隔时间、最大页数等)
 
-选择 `登录微信公众平台`,会自动打开浏览器,扫码登录后保存 Token 和 Cookie(默认有效期 4 天)。
+配置会自动保存到 `config.json`,下次直接使用。
 
-#### 3. 爬取单个公众号
+#### 第二步: 登录微信 🔐
 
-选择 `爬取单个公众号` 后:
-- 可选择使用默认配置或自定义参数(天数/数量/页数/日期范围/全部)
-- 输入公众号名称即可开始爬取
+选择 `登录微信公众平台`:
+1. 自动打开浏览器
+2. 手机微信扫码登录
+3. 登录信息保存 4 天,期间无需重复登录
 
-#### 4. 批量爬取
+#### 第三步: 开始爬取 📄
 
-选择 `批量爬取多个公众号` 后:
-- 可使用 config.json 中的列表,或手动输入多个公众号
-- 支持自定义参数和账号间隔
+**爬取单个公众号:**
+1. 选择 `爬取单个公众号`
+2. 选择爬取方式(按天数/按数量/按日期范围/全部)
+3. 输入公众号名称
+4. 等待爬取完成
 
-### 方式二: 命令行模式 (适合脚本化)
+**批量爬取多个公众号:**
+1. 选择 `批量爬取多个公众号`
+2. 选择使用配置文件列表或手动输入
+3. 设置参数后开始批量爬取
 
-#### 1. 配置向导
+### 查看结果
 
+**本地文件模式:**
 ```bash
-pnpm dev init
+output/
+├── 公众号名称/
+│   ├── 文章标题.md          # Markdown 格式
+│   ├── images/              # 文章图片
+│   └── metadata.json        # 元数据
 ```
 
-#### 2. 登录
-
+**数据库模式:**
 ```bash
-pnpm spider:login
+# 可视化查看数据库
+pnpm db:studio
+
+# 在浏览器打开 http://localhost:5555
 ```
 
-#### 3. 爬取单个公众号
+## 📖 常见使用场景
 
+### 场景 1: 个人知识库归档
+
+**需求**: 收藏的公众号文章保存到本地,方便离线阅读
+
+**配置**:
+- 存储模式: `local` (本地文件)
+- 保存格式: `markdown`
+- 下载媒体: ✅ 开启
+
+**操作**:
 ```bash
-pnpm dev scrape "腾讯科技" --days 30 --skip-existing
+pnpm dev
+# 选择: 爬取单个公众号 → 按天数 → 输入 30 天 → 输入公众号名
 ```
 
-#### 4. 批量爬取
+### 场景 2: 内容数据分析
 
+**需求**: 批量采集多个公众号数据用于分析
+
+**配置**:
+- 存储模式: `database` (数据库)
+- 下载媒体: ❌ 关闭(只需文本)
+
+**操作**:
 ```bash
-pnpm dev batch
+pnpm dev
+# 选择: 批量爬取 → 使用配置文件 → 自定义参数 → 按数量 → 100 篇
 ```
 
-从 config.json 读取公众号列表批量爬取。
+### 场景 3: 完整备份归档
 
-#### 5. 导出 CSV
+**需求**: 重要公众号的完整备份(文件+数据库)
 
+**配置**:
+- 存储模式: `both` (双模式)
+- 下载媒体: ✅ 开启
+
+**操作**:
 ```bash
-pnpm dev export "腾讯科技" -o ./exports/tencent.csv
+pnpm dev
+# 选择: 爬取单个公众号 → 爬取全部 → 输入公众号名
 ```
 
-## 📖 使用方式对比
+## ⚙️ 配置说明
 
-| 方式 | 适用场景 | 优点 | 缺点 |
-|------|---------|------|------|
-| **交互式菜单** (`pnpm dev`) | 新手、临时使用 | 无需记命令,引导式操作 | 不适合自动化 |
-| **命令行** (`pnpm dev scrape`) | 熟练用户、脚本化 | 灵活、可自动化 | 需要记住参数 |
+配置文件 `config.json` 支持注释,项目已内置默认配置,可直接使用。
 
-## 📖 命令行模式详解
+### 核心配置项
 
-> 如果你更喜欢交互式,直接运行 `pnpm dev` 即可,无需记以下命令。
-
-### 配置向导
-```bash
-pnpm dev init
+```json5
+{
+  "storage": {
+    "mode": "local",              // 存储模式: local | database | both
+    "local": {
+      "baseDir": "./output",      // 输出目录
+      "saveAs": "markdown",       // 保存格式: markdown | html
+      "downloadMedia": true       // 是否下载图片/视频
+    }
+  },
+  "scraper": {
+    "requestInterval": 10,        // 请求间隔(秒)
+    "maxPages": 10,               // 最大页数
+    "days": 30                    // 默认爬取天数
+  }
+}
 ```
 
-交互式生成 config.json,包含所有配置项。
+**修改配置:** 运行 `pnpm dev` 选择"配置向导"即可。
 
-### 登录
+## 💡 进阶技巧
+
+### 定时自动爬取
+
+**macOS/Linux:**
 ```bash
-pnpm spider:login
+# 每天凌晨 2 点自动爬取
+crontab -e
+# 添加: 0 2 * * * cd /path/to/wechat-spider-node && pnpm dev batch
 ```
 
-### 搜索公众号
-```bash
-pnpm dev search <公众号名称>
-```
+**Windows:**
+使用任务计划程序创建定时任务。
 
-### 爬取文章
-```bash
-pnpm dev scrape <公众号名称> [选项]
+### 批量配置多个公众号
 
-选项:
-  -p, --pages <number>   最大爬取页数
-  -d, --days <number>    爬取最近几天的文章
-  -l, --limit <number>   限制文章数量
-  --start-date <date>    开始日期 (YYYY-MM-DD)
-  --end-date <date>      结束日期 (YYYY-MM-DD)
-  --all                  爬取所有文章
-  --skip-existing        跳过已存在的文章
-```
-
-**参数优先级说明:**
-- 时间过滤 (--days/--start-date) 优先级**最高**,遇到超期文章会直接停止爬取
-- 数量限制 (--limit) 其次,达到数量后停止
-- 页数限制 (--pages) 是保护上限,防止无限爬取
-
-示例:
-```bash
-# 爬取最近 7 天的文章
-pnpm dev scrape "腾讯科技" --days 7
-
-# 爬取前 50 篇文章
-pnpm dev scrape "36氪" --limit 50
-
-# 跳过已爬取的文章
-pnpm dev scrape "新浪科技" --skip-existing
-```
-
-### 批量爬取
-
-```bash
-pnpm dev batch
-```
-
-从 `config.json` 读取公众号列表:
-```json
+编辑 `config.json`:
+```json5
 {
   "batch": {
     "accounts": [
       "腾讯科技",
       "36氪",
-      "新浪科技"
+      "新浪科技",
+      "虎嗅网"
     ],
-    "accountInterval": 10
+    "accountInterval": 10  // 每个账号间隔 10 秒
   }
 }
 ```
 
-使用示例:
+然后运行:
 ```bash
-# 使用配置文件中的所有设置
-pnpm dev batch
-
-# 自定义参数
-pnpm dev batch --mode database --limit 10 --skip-existing
+pnpm dev
+# 选择: 批量爬取 → 使用配置文件
 ```
 
-### 导出 CSV
-```bash
-pnpm dev export <公众号名称> [选项]
+## 📊 存储模式对比
 
-选项:
-  -o, --output <path>    输出文件路径 (默认: ./<公众号名称>.csv)
-```
+| 模式 | 优点 | 缺点 | 适用场景 |
+|-----|------|------|---------|
+| **local** | 完整离线归档,方便分享 | 无法查询,大量文件管理困难 | 个人知识库,博客备份 |
+| **database** | 高效查询,去重,分析 | 需要工具查看 | 数据分析,搜索引擎 |
+| **both** | 两者优点都有 | 占用空间大 | 重要内容归档 |
 
-## ⚙️ 配置说明
+## ⚠️ 注意事项
 
-### config.json
-
-配置文件支持 JSON5 格式,可以添加注释。
-
-配置示例 (支持 `//` 注释):
-
-```json5
-{
-  "storage": {
-    "mode": "local",                    // 存储模式
-    "local": {
-      "baseDir": "./output",            // 输出目录
-      "folderNameTemplate": "{title}_{date}",  // 文件夹命名规则
-      "downloadMedia": true,            // 是否下载图片/视频
-      "saveAs": "markdown",             // 保存格式: markdown | html
-      "includeMetadata": true           // 是否保存元数据 JSON
-    },
-    "database": {
-      "type": "sqlite",
-      "saveMediaUrls": true,            // 保存媒体链接
-      "downloadMedia": false            // 是否同时下载到本地
-    }
-  },
-  "media": {
-    "download": {
-      "images": true,
-      "videos": true,
-      "timeout": 30000,                 // 下载超时(ms)
-      "retryTimes": 3,                  // 重试次数
-      "concurrent": 5                   // 并发下载数
-    }
-  },
-  "scraper": {
-    "requestInterval": 10,              // 请求间隔(秒)
-    "maxPages": 10,
-    "days": 30
-  }
-}
-```
-
-### .env
-
-```bash
-DATABASE_URL="file:./data/wechat.db"
-WECHAT_CACHE_FILE="wechat_cache.json"
-WECHAT_CACHE_EXPIRE_HOURS=96
-STORAGE_MODE="local"
-LOG_LEVEL="info"
-```
+1. **请求间隔**: 建议设置合理的请求间隔(默认 10 秒),避免被微信限制
+2. **登录缓存**: Token 默认有效期 4 天,过期后需要重新登录
+3. **首次使用**: 运行 `pnpm dev` 后先选择"配置向导",完成基础配置
+4. **媒体下载**: 大量下载可能耗时较长,建议先小范围测试
+5. **数据库查看**: 使用 `pnpm db:studio` 可视化查看数据库内容
 
 ## 📂 项目结构
 
@@ -281,48 +242,28 @@ wechat-spider-node/
 │   ├── storage/         # 存储模块(本地文件 + 数据库)
 │   ├── media/           # 图片/视频下载
 │   ├── logger/          # 日志系统
-│   ├── cli/             # CLI 工具
-│   └── types/           # 类型定义
-├── prisma/              # 数据库模型
+│   └── cli/             # 交互式命令行界面
 ├── output/              # 本地文件输出目录
 ├── data/                # 数据库文件
-└── logs/                # 日志文件
+├── logs/                # 日志文件
+└── config.json          # 配置文件
 ```
 
-## 🔧 开发
+## 🔧 常用命令
 
 ```bash
-# 开发模式(热重载)
-pnpm dev <command>
+# 启动交互式菜单(最常用)
+pnpm dev
+
+# 查看数据库内容
+pnpm db:studio
 
 # 类型检查
 pnpm type-check
 
-# 构建
+# 构建项目
 pnpm build
-
-# 运行构建后的版本
-pnpm start
-
-# 查看数据库
-pnpm db:studio
 ```
-
-## ⚠️ 注意事项
-
-1. **请求间隔**: 建议设置合理的请求间隔(默认 10 秒),避免被微信限制
-2. **登录缓存**: Token 默认有效期 4 天,过期后需要重新登录
-3. **文件夹命名**: 会自动清理文件名中的非法字符
-4. **媒体下载**: 大量下载可能耗时较长,可以先用 `--no-media` 测试
-5. **数据库**: SQLite 适合单机使用,如需多服务器共享可切换到 MySQL
-
-## 📊 存储模式对比
-
-| 模式 | 优点 | 缺点 | 适用场景 |
-|-----|------|------|---------|
-| **local** | 完整离线归档,方便分享 | 无法查询,大量文件管理困难 | 个人知识库,博客备份 |
-| **database** | 高效查询,去重,分析 | 需要工具查看 | 数据分析,搜索引擎 |
-| **both** | 两者优点都有 | 占用空间大 | 重要内容归档 |
 
 ## 📝 License
 
@@ -330,4 +271,4 @@ MIT
 
 ## 🙏 致谢
 
-本项目是 [WeMediaSpider](../WeMediaSpider) Python 版本的 Node.js 重构版本。
+本项目是 [WeMediaSpider](https://github.com/seanzhang-zhichen/WeMediaSpider) Python 版本的 Node.js 重构版本。
