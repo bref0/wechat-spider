@@ -1,0 +1,72 @@
+{
+  // ==================== 存储配置 ====================
+  // 存储模式: 'local' (本地文件) | 'database' (数据库) | 'both' (两者都有)
+  "storage": {
+    "mode": "both",
+
+    // 本地存储配置 (mode = 'local' 或 'both' 时生效)
+    "local": {
+      "baseDir": "./output",                    // 文件保存目录
+      "folderNameTemplate": "({title})", // 文件夹命名模板 (支持变量: {title}, {date}, {account})
+      "downloadMedia": true,          // 是否下载媒体文件 (图片/视频)
+      "saveAs": "markdown",                      // 文章保存格式: 'markdown' | 'html'
+      "includeMetadata": true,      // 是否生成元数据文件 (metadata.json)
+      "sanitizeFolderName": true // 是否清理文件夹名称中的特殊字符
+    },
+
+    // 数据库存储配置 (mode = 'database' 或 'both' 时生效)
+    "database": {
+      "type": "sqlite",                       // 数据库类型: 'sqlite' | 'mysql' | 'postgresql'
+      "url": "file:./data/wechat.db",                         // 数据库连接字符串
+      "saveMediaUrls": true,       // 是否保存媒体文件 URL
+      "downloadMedia": false,       // 是否下载媒体文件到本地
+      "mediaDir": "./data/media"                // 媒体文件保存目录 (downloadMedia=true 时生效)
+    }
+  },
+
+  // ==================== 媒体文件配置 ====================
+  "media": {
+    "download": {
+      "images": true,                       // 是否下载图片
+      "videos": true,                       // 是否下载视频
+      "timeout": 30000,                     // 下载超时时间 (毫秒)
+      "retryTimes": 3,               // 下载失败重试次数
+      "concurrent": 5                // 并发下载数量
+    },
+    "naming": {
+      "useOriginalName": false,       // 是否使用原始文件名
+      "pattern": "{type}-{index}.{ext}"                      // 文件命名模式 (支持变量: {type}, {index}, {ext})
+    }
+  },
+
+  // ==================== 爬虫配置 ====================
+  "scraper": {
+    "requestInterval": 10,              // 请求间隔 (秒) - 建议 10-15 秒
+    "maxPages": 30,                            // 默认爬取最大页数
+    "days": 60                                     // 默认爬取最近多少天
+  },
+
+  // ==================== 导出配置 ====================
+  "export": {
+    "csv": {
+      "enabled": true,                         // 是否启用 CSV 导出
+      "encoding": "utf8",                     // 文件编码: 'utf8' | 'gbk'
+      "includeContent": true,           // 是否包含文章内容
+      "includeMediaLinks": true      // 是否包含媒体链接
+    }
+  },
+
+  // ==================== 批量爬取配置 ====================
+  "batch": {
+    // 公众号列表 (支持在 init 时用逗号/顿号分隔输入)
+    "accounts": [
+        "哦个崽",
+        "小绵羊羊",
+        "女头集",
+        "女头日记",
+        "曼萝",
+        "女生头像库"
+    ],
+    "accountInterval": 10                 // 账号间隔 (秒) - 顺序执行,避免被封
+  }
+}
