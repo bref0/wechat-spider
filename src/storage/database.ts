@@ -8,7 +8,6 @@ if (!dbUrl) {
   logger.error('请检查 .env 文件中的 DATABASE_URL 配置');
   process.exit(0);
 }
-logger.info(dbUrl)
 
 export const prisma = new PrismaClient({
   log: ['error', 'warn'],

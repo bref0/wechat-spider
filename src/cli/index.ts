@@ -4,9 +4,8 @@ import { WeChatLogin } from '../wechat/login.js';
 import { WeChatScraper } from '../wechat/scraper.js';
 import { saveArticles } from '../storage';
 import { logger } from '../logger';
-import { loadConfig, updateConfig } from '../config';
+import { loadConfig } from '../config';
 import { searchAccount } from '../wechat/api.js';
-import { initConfig } from './init.js';
 import { startInteractive } from './interactive.js';
 
 const program = new Command();
@@ -19,19 +18,6 @@ program
     // 无参数时启动交互式菜单
     if (process.argv.length === 2) {
       await startInteractive();
-    }
-  });
-
-// 交互式配置向导
-program
-  .command('init')
-  .description('交互式配置向导 (生成 config.json)')
-  .action(async () => {
-    try {
-      await initConfig();
-    } catch (error) {
-      logger.error(`配置失败: ${error}`);
-      process.exit(1);
     }
   });
 
@@ -80,27 +66,16 @@ program
 program
   .command('scrape <name>')
   .description('爬取单个公众号')
-  .option('--mode <mode>', '存储模式: database', 'database')
   .option('-p, --pages <number>', '最大页数', '10')
   .option('-d, --days <number>', '最近几天', '30')
   .option('-l, --limit <number>', '限制文章数量')
   .option('--start-date <date>', '开始日期 (YYYY-MM-DD)')
   .option('--end-date <date>', '结束日期 (YYYY-MM-DD)')
   .option('--all', '爬取所有文章(忽略 pages 限制)')
-  .option('-c, --content', '获取文章内容', true)
-  .option('--no-media', '不下载图片/视频')
   .option('--skip-existing', '跳过数据库中已存在的文章')
   .action(async (name: string, options: any) => {
     try {
       const config = await loadConfig();
-
-      // 临时覆盖配置
-      if (options.mode) {
-        config.storage.mode = options.mode;
-      }
-
-      // 更新配置缓存
-      updateConfig(config);
 
       const scraper = new WeChatScraper(config); // 传入配置
       const articles = await scraper.scrapeAccount(name, {
@@ -109,7 +84,6 @@ program
         limit: options.limit ? parseInt(options.limit) : undefined,
         startDate: options.startDate,
         endDate: options.endDate,
-        includeContent: options.content,
         skipExisting: options.skipExisting,
       });
 
@@ -132,14 +106,11 @@ program
 program
   .command('batch')
   .description('批量爬取配置文件中的公众号列表')
-  .option('--mode <mode>', '存储模式: database')
   .option('-p, --pages <number>', '最大页数')
   .option('-d, --days <number>', '最近几天')
   .option('-l, --limit <number>', '每个公众号限制文章数量')
   .option('--start-date <date>', '开始日期 (YYYY-MM-DD)')
   .option('--end-date <date>', '结束日期 (YYYY-MM-DD)')
-  .option('-c, --content', '获取文章内容', true)
-  .option('--no-media', '不下载图片/视频')
   .option('--skip-existing', '跳过数据库中已存在的文章')
   .action(async (options: any) => {
     try {
@@ -161,14 +132,6 @@ program
       const accounts = config.batch.accounts;
       const accountInterval = config.batch?.accountInterval || 10;
       logger.info(`从配置文件读取到 ${accounts.length} 个公众号`);
-
-      // CLI 参数覆盖配置
-      if (options.mode) {
-        config.storage.mode = options.mode;
-      }
-
-      // 更新配置缓存
-      updateConfig(config);
 
       logger.info(`账号间隔: ${accountInterval} 秒`);
 

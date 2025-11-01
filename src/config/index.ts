@@ -12,6 +12,7 @@ let cachedConfig: Config | null = null;
 
 export async function loadConfig(): Promise<Config> {
   if (cachedConfig) {
+    logger.info('已缓存配置,直接返回');
     return cachedConfig;
   }
 
@@ -42,19 +43,4 @@ export async function loadConfig(): Promise<Config> {
 
   return cachedConfig;
 }
-
-/**
- * 重置配置缓存(用于 CLI 参数覆盖配置时)
- */
-export function resetConfigCache(): void {
-  cachedConfig = null;
-}
-
-/**
- * 更新配置缓存(用于 CLI 参数覆盖配置时)
- */
-export function updateConfig(config: Config): void {
-  cachedConfig = config;
-}
-
 export { type Config };
