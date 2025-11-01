@@ -105,8 +105,3 @@ export class WeChatLogin {
     return cache;
   }
 }
-
-export async function quickLogin(): Promise<LoginCache> {
-  const loginManager = new WeChatLogin();
-  return await loginManager.login();
-}
