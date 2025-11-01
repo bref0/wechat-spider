@@ -8,25 +8,26 @@ datasource db {
 }
 
 model Account {
-  id         String    @id @default(cuid())
-  name       String
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  articles   Article[]
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(200)
+  created_at DateTime
+  updated_at DateTime
 
   @@unique([name])
+  @@map("account")
 }
 
 model Article {
-  id                String    @id @default(cuid())
-  account_id        String
-  account           Account   @relation(fields: [account_id], references: [id], onDelete: Cascade)
-  title             String
-  url               String    @unique
+  id                Int      @id @default(autoincrement())
+  account_id        Int
+  title             String   @db.VarChar(200)
+  url               String   @db.VarChar(200)
   publish_timestamp Int?
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
+  created_at        DateTime
+  updated_at        DateTime
 
+  @@unique([url])
   @@index([account_id])
   @@index([publish_timestamp])
+  @@map("article")
 }

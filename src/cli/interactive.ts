@@ -1,9 +1,8 @@
 import inquirer from 'inquirer';
 import { logger } from '../logger';
-import { initConfig } from './init.js';
 import { WeChatLogin } from '../wechat/login.js';
 import { WeChatScraper } from '../wechat/scraper.js';
-import { loadConfig, resetConfigCache } from '../config';
+import { loadConfig } from '../config';
 import { saveArticles } from '../storage';
 
 /**
@@ -24,9 +23,7 @@ export async function startInteractive() {
           name: 'action',
           message: '请选择操作 (输入数字):',
           choices: [
-            { name: '⚙️  配置向导 - 生成/修改 config.json', value: 'config' },
             { name: '🔐 登录微信公众平台', value: 'login' },
-            { name: '📄 爬取单个公众号', value: 'scrape' },
             { name: '📚 批量爬取多个公众号', value: 'batch' },
             { name: '❌ 退出', value: 'exit' },
           ],
@@ -42,14 +39,8 @@ export async function startInteractive() {
       console.log('\n' + '='.repeat(60) + '\n');
 
       switch (action) {
-        case 'config':
-          await handleConfig();
-          break;
         case 'login':
           await handleLogin();
-          break;
-        case 'scrape':
-          await handleScrape();
           break;
         case 'batch':
           await handleBatch();
@@ -72,18 +63,6 @@ export async function startInteractive() {
 }
 
 /**
- * 处理配置向导
- */
-async function handleConfig() {
-  await initConfig(true); // 传入 true 表示在交互式菜单中
-  // 配置修改后清除缓存,确保后续操作使用新配置
-  resetConfigCache();
-
-  // 等待所有异步日志输出完成,避免覆盖主菜单
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-}
-
-/**
  * 处理登录
  */
 async function handleLogin() {
@@ -91,187 +70,6 @@ async function handleLogin() {
   const login = new WeChatLogin();
   await login.login();
   logger.info('\n✅ 登录成功!');
-
-  // 等待所有异步日志输出完成,避免覆盖主菜单
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-}
-
-/**
- * 处理单个公众号爬取
- */
-async function handleScrape() {
-  const config = await loadConfig();
-
-    // 询问是否使用默认配置
-    const { useDefaultConfig } = await inquirer.prompt([
-      {
-        type: 'rawlist',
-        name: 'useDefaultConfig',
-        message: '爬取参数配置:',
-        choices: [
-          { name: '使用 config.json 默认配置', value: 'default' },
-          { name: '自定义参数', value: 'custom' },
-          { name: '← 返回上一级', value: 'back' },
-        ],
-      },
-    ]);
-
-    if (useDefaultConfig === 'back') {
-      return;
-    }
-
-  let options: any = {};
-
-  if (useDefaultConfig === 'custom') {
-    // 进入3级菜单前显示分隔线
-    console.log('\n' + '='.repeat(60) + '\n');
-
-    // 自定义参数
-    const customConfig = await inquirer.prompt([
-      {
-        type: 'rawlist',
-        name: 'paramType',
-        message: '选择爬取范围:',
-        choices: [
-          { name: '按天数 - 爬取最近 N 天', value: 'days' },
-          { name: '按数量 - 爬取前 N 篇', value: 'limit' },
-          { name: '按页数 - 爬取前 N 页', value: 'pages' },
-          { name: '按日期范围 - 指定开始和结束日期', value: 'date-range' },
-          { name: '全部爬取 - 爬取所有文章', value: 'all' },
-          { name: '← 返回上一级', value: 'back' },
-        ],
-      },
-    ]);
-
-    if (customConfig.paramType === 'back') {
-      console.log('\n' + '='.repeat(60) + '\n');
-      return;
-    }
-
-    // 进入4级菜单(具体参数输入)前显示分隔线
-    console.log('\n' + '='.repeat(60) + '\n');
-
-    switch (customConfig.paramType) {
-      case 'days':
-        const { days } = await inquirer.prompt([
-          {
-            type: 'number',
-            name: 'days',
-            message: '爬取最近多少天的文章:',
-            default: config.scraper.days,
-            validate: (input) => input > 0 || '必须大于 0',
-          },
-        ]);
-        options.days = days;
-        break;
-
-      case 'limit':
-        const { limit } = await inquirer.prompt([
-          {
-            type: 'number',
-            name: 'limit',
-            message: '爬取多少篇文章:',
-            default: 10,
-            validate: (input) => input > 0 || '必须大于 0',
-          },
-        ]);
-        options.limit = limit;
-        break;
-
-      case 'pages':
-        const { pages } = await inquirer.prompt([
-          {
-            type: 'number',
-            name: 'pages',
-            message: '爬取多少页:',
-            default: config.scraper.maxPages,
-            validate: (input) => input > 0 || '必须大于 0',
-          },
-        ]);
-        options.pages = pages;
-        break;
-
-      case 'date-range':
-        const dateRange = await inquirer.prompt([
-          {
-            type: 'input',
-            name: 'startDate',
-            message: '开始日期 (YYYY-MM-DD):',
-            validate: (input) => {
-              if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) {
-                return '日期格式错误,请使用 YYYY-MM-DD';
-              }
-              return true;
-            },
-          },
-          {
-            type: 'input',
-            name: 'endDate',
-            message: '结束日期 (YYYY-MM-DD):',
-            validate: (input) => {
-              if (!/^\d{4}-\d{2}-\d{2}$/.test(input)) {
-                return '日期格式错误,请使用 YYYY-MM-DD';
-              }
-              return true;
-            },
-          },
-        ]);
-        options.startDate = dateRange.startDate;
-        options.endDate = dateRange.endDate;
-        break;
-
-      case 'all':
-        options.all = true;
-        break;
-    }
-
-    // 其他选项
-    const extraOptions = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'skipExisting',
-        message: '是否跳过已爬取的文章?',
-        default: false,
-      },
-    ]);
-
-    options = { ...options, ...extraOptions };
-  }
-
-  // 输入公众号名称
-  const { accountName } = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'accountName',
-      message: '请输入公众号名称:',
-      validate: (input) => {
-        if (!input || !input.trim()) {
-          return '公众号名称不能为空';
-        }
-        return true;
-      },
-    },
-  ]);
-
-  // 开始爬取
-  console.log(`\n开始爬取公众号: ${accountName}`);
-
-  const scraper = new WeChatScraper();
-  const articles = await scraper.scrapeAccount(accountName.trim(), {
-    maxPages: options.pages,
-    limit: options.limit,
-    days: options.days,
-    startDate: options.startDate,
-    endDate: options.endDate,
-    skipExisting: options.skipExisting,
-  });
-
-  console.log(`\n✅ 共爬取 ${articles.length} 篇文章`);
-
-  // 保存文章
-  await saveArticles(articles);
-
-  console.log('\n✅ 爬取完成!');
 
   // 等待所有异步日志输出完成,避免覆盖主菜单
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -295,7 +93,7 @@ async function handleBatch() {
       message: '选择公众号来源:',
       choices: [
         ...(hasConfigAccounts
-          ? [{ name: `使用 config.json 配置 (${config.batch.accounts.length} 个)`, value: 'config' }]
+          ? [{ name: `使用 config.json 配置 (${config.batch?.accounts?.length ?? 0} 个)`, value: 'config' }]
           : []),
         { name: '手动输入公众号列表', value: 'manual' },
         { name: '← 返回上一级', value: 'back' },
@@ -308,7 +106,7 @@ async function handleBatch() {
   }
 
   if (accountSource === 'config') {
-    accounts = config.batch.accounts;
+    accounts = config.batch?.accounts ?? [];
     console.log(`\n将爬取以下公众号: ${accounts.join(', ')}`);
   } else {
     const { manualAccounts } = await inquirer.prompt([
@@ -325,9 +123,9 @@ async function handleBatch() {
         filter: (input) => {
           // 支持中英文逗号、顿号分隔
           return input
-            .split(/[,,,、]/)
-            .map((s: string) => s.trim())
-            .filter((s: string) => s);
+              .split(/[,，、]/)  // 英文逗号, 中文逗号，顿号
+              .map((s: string) => s.trim())
+              .filter((s: string) => s);
         },
       },
     ]);
@@ -389,7 +187,7 @@ async function handleBatch() {
             name: 'days',
             message: '爬取最近多少天的文章:',
             default: config.scraper.days,
-            validate: (input) => input > 0 || '必须大于 0',
+            validate: (input) => (input ?? 0) > 0 || '必须大于 0',
           },
         ]);
         options.days = days;
@@ -402,7 +200,7 @@ async function handleBatch() {
             name: 'limit',
             message: '爬取多少篇文章:',
             default: 10,
-            validate: (input) => input > 0 || '必须大于 0',
+            validate: (input) => (input ?? 0) > 0 || '必须大于 0',
           },
         ]);
         options.limit = limit;
@@ -415,7 +213,7 @@ async function handleBatch() {
             name: 'pages',
             message: '爬取多少页:',
             default: config.scraper.maxPages,
-            validate: (input) => input > 0 || '必须大于 0',
+            validate: (input) => (input ?? 0) > 0 || '必须大于 0',
           },
         ]);
         options.pages = pages;
@@ -440,7 +238,7 @@ async function handleBatch() {
       name: 'accountInterval',
       message: '账号之间的间隔时间 (秒):',
       default: config.batch?.accountInterval || 10,
-      validate: (input) => input >= 0 || '不能为负数',
+      validate: (input) => (input ?? 0) >= 0 || '不能为负数',
     },
   ]);
 

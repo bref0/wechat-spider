@@ -15,39 +15,6 @@ export async function initConfig(isInInteractiveMenu: boolean = false) {
   console.log('🚀 欢迎使用微信公众号爬虫配置向导\n');
 
   const answers = await inquirer.prompt([
-    // ==================== 存储配置 ====================
-    {
-      type: 'list',
-      name: 'storageMode',
-      message: '选择存储模式:',
-      choices: [
-        { name: 'database - 数据库 (SQLite)', value: 'database' },
-        { name: 'both - 两者都保存', value: 'both' },
-      ],
-      default: 'database',
-    },
-
-    // Database 存储配置
-    {
-      type: 'list',
-      name: 'dbType',
-      message: '数据库类型:',
-      choices: [
-        { name: 'mysql - MySQL', value: 'mysql' },
-      ],
-      default: 'mysql',
-      when: (answers) => answers.storageMode === 'database'
-    },
-    {
-      type: 'input',
-      name: 'dbUrl',
-      message: '数据库连接字符串:',
-      default: () => {
-        return 'mysql://user:password@localhost:3306/wechat';
-      },
-      when: (answers) => answers.storageMode === 'database'
-    },
-
     // ==================== 爬虫配置 ====================
     {
       type: 'number',
@@ -55,7 +22,7 @@ export async function initConfig(isInInteractiveMenu: boolean = false) {
       message: '请求间隔 (秒, 建议 10-15):',
       default: 10,
       validate: (input) => {
-        if (input < 5) {
+        if ((input ?? 0) < 5) {
           return '建议不要小于 5 秒,避免被限制';
         }
         return true;
@@ -84,9 +51,9 @@ export async function initConfig(isInInteractiveMenu: boolean = false) {
         if (!input) return [];
         // 支持中英文逗号、顿号分隔
         return input
-          .split(/[,,,、]/)
-          .map((s: string) => s.trim())
-          .filter((s: string) => s);
+            .split(/[,，、]/)  // 英文逗号, 中文逗号，顿号
+            .map((s: string) => s.trim())
+            .filter((s: string) => s);
       },
     },
     {
@@ -95,7 +62,7 @@ export async function initConfig(isInInteractiveMenu: boolean = false) {
       message: '批量爬取时账号间隔 (秒, 建议 10-30):',
       default: 10,
       validate: (input) => {
-        if (input < 5) {
+        if ((input ?? 0) < 5) {
           return '间隔不能少于 5 秒,避免被封';
         }
         return true;
@@ -107,10 +74,10 @@ export async function initConfig(isInInteractiveMenu: boolean = false) {
   // 生成配置对象
   const config = {
     storage: {
-      mode: answers.storageMode,
+      mode: 'database',
       database: {
-        type: answers.dbType || 'mysql',
-        url: answers.dbUrl || 'mysql://user:password@localhost:3306/wechat',
+        type: 'mysql',
+        url: 'mysql://user:password@localhost:3306/wechat',
       },
     },
     scraper: {

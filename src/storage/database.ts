@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import path from 'path';
 import type { Article } from '../types';
 import {logger} from "../logger";
 
@@ -9,15 +8,13 @@ if (!dbUrl) {
   logger.error('DATABASE_URL 环境变量未设置');
   process.exit(1);
 }
-const absoluteDbUrl = dbUrl.startsWith('file:./')
-  ? `file:${path.resolve(process.cwd(), dbUrl.replace('file:', ''))}`
-  : dbUrl;
+logger.info(dbUrl)
 
 export const prisma = new PrismaClient({
   log: ['error', 'warn'],
   datasources: {
     db: {
-      url: absoluteDbUrl,
+      url: dbUrl,
     },
   },
 });
@@ -27,27 +24,37 @@ process.on('beforeExit', async () => {
 });
 
 export async function saveArticleToDatabase(article: Article): Promise<void> {
-  // 1. 确保账号存在
+
+  // 转换为北京时间
+  const now = new Date();
+  const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+
+  // 1. 保存公众号
   const account = await prisma.account.upsert({
     where: {name: article.accountName},
     update: {},
     create: {
       name: article.accountName,
+      created_at: beijingTime,
+      updated_at: beijingTime,
     },
   });
 
-  // 3. 保存文章
+  // 2. 保存文章
   await prisma.article.upsert({
     where: { url: article.url },
     update: {
       title: article.title,
       publish_timestamp: article.publishTimestamp,
+      updated_at: beijingTime,
     },
     create: {
       account_id: account.id,
       title: article.title,
       url: article.url,
-      publish_timestamp: article.publishTimestamp
+      publish_timestamp: article.publishTimestamp,
+      created_at: beijingTime,
+      updated_at: beijingTime,
     },
   });
 }

@@ -124,8 +124,8 @@ async function setup() {
   console.log('  1. 使用交互式菜单:');
   console.log('     pnpm dev\n');
   console.log('  2. 或使用命令行:');
-  console.log('     pnpm spider:login           # 登录');
-  console.log('     pnpm dev scrape "公众号"    # 爬取');
+  console.log('     pnpm spider:login # 登录');
+  console.log('     pnpm dev batch    # 爬取');
   console.log('');
   console.log('详细使用方法请查看: README.md 和 USAGE.md\n');
 }

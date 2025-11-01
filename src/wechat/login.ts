@@ -4,8 +4,8 @@ import { logger } from '../logger';
 import type { LoginCache } from '../types';
 
 export class WeChatLogin {
-  private cacheFile: string;
-  private cacheExpireMs: number;
+  private readonly cacheFile: string;
+  private readonly cacheExpireMs: number;
 
   constructor(
     cacheFile = process.env.WECHAT_CACHE_FILE || 'wechat_cache.json',
