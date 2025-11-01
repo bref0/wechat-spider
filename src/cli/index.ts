@@ -2,9 +2,9 @@
 import { Command } from 'commander';
 import { WeChatLogin } from '../wechat/login.js';
 import { WeChatScraper } from '../wechat/scraper.js';
-import { saveArticles } from '../storage/index.js';
-import { logger } from '../logger/index.js';
-import { loadConfig, updateConfig } from '../config/index.js';
+import { saveArticles } from '../storage';
+import { logger } from '../logger';
+import { loadConfig, updateConfig } from '../config';
 import { searchAccount } from '../wechat/api.js';
 import { initConfig } from './init.js';
 import { startInteractive } from './interactive.js';

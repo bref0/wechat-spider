@@ -3,7 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import JSON5 from 'json5';
 import { configSchema, type Config } from './schema.js';
-import { logger } from '../logger/index.js';
+import { logger } from '../logger';
 
 // 加载环境变量
 dotenv.config();
@@ -33,6 +33,10 @@ export async function loadConfig(): Promise<Config> {
   }
   // 直接解析用户配置,Zod 会自动填充默认值
   cachedConfig = configSchema.parse(userConfig);
+  if (process.env.DATABASE_URL) {
+    cachedConfig.storage.database.url = process.env.DATABASE_URL;
+    logger.info('已从环境变量加载数据库连接字符串');
+  }
   // 注意: 不再从环境变量覆盖配置,请在 config.json 中设置
   // 环境变量仅用于数据库连接、日志级别等敏感信息
 

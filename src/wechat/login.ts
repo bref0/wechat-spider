@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import fs from 'fs-extra';
-import { logger } from '../logger/index.js';
-import type { LoginCache } from '../types/index.js';
+import { logger } from '../logger';
+import type { LoginCache } from '../types';
 
 export class WeChatLogin {
   private cacheFile: string;

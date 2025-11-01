@@ -7,10 +7,7 @@
     // 数据库存储配置 (mode = 'database' 或 'both' 时生效)
     "database": {
       "type": "mysql",                       // 数据库类型: 'sqlite' | 'mysql' | 'postgresql'
-      "url": "mysql://user:password@localhost:3306/wechat",                         // 数据库连接字符串
-      "saveMediaUrls": false,       // 是否保存媒体文件 URL
-      "downloadMedia": false,       // 是否下载媒体文件到本地
-      "mediaDir": "./data/media"                // 媒体文件保存目录 (downloadMedia=true 时生效)
+      "url": "",                         // 数据库连接字符串
     }
   },
 

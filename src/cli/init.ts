@@ -42,9 +42,8 @@ export async function initConfig(isInInteractiveMenu: boolean = false) {
       type: 'input',
       name: 'dbUrl',
       message: '数据库连接字符串:',
-      default: (answers: any) => {
-        if (answers.dbType === 'mysql') return 'mysql://user:password@localhost:3306/wechat';
-        return 'file:./data/wechat.db';
+      default: () => {
+        return 'mysql://user:password@localhost:3306/wechat';
       },
       when: (answers) => answers.storageMode === 'database'
     },

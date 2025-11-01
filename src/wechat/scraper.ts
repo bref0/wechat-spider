@@ -1,13 +1,13 @@
 import { WeChatLogin } from './login.js';
 import { searchAccount, getArticlesList } from './api.js';
-import { logger } from '../logger/index.js';
-import { loadConfig } from '../config/index.js';
+import { logger } from '../logger';
+import { loadConfig } from '../config';
 import { filterExistingArticles } from '../storage/database.js';
-import type { Article } from '../types/index.js';
+import type { Article } from '../types';
 
 export class WeChatScraper {
   private login: WeChatLogin;
-  private config: any;
+  private readonly config: any;
 
   constructor(config?: any) {
     this.login = new WeChatLogin();

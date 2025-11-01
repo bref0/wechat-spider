@@ -1,14 +1,8 @@
 export interface Article {
-  accountName: string;
   title: string;
   url: string;
-  publishTime?: Date;
   publishTimestamp?: number;
-  content?: string;
-  summary?: string;
-  digest?: string;
-  images?: string[];
-  videos?: string[];
+  accountName: string;
 }
 
 export interface LoginCache {

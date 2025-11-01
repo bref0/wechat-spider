@@ -8,27 +8,25 @@ datasource db {
 }
 
 model Account {
-  id        String    @id @default(cuid())
-  name      String
-  platform  String    @default("wechat")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  articles  Article[]
+  id         String    @id @default(cuid())
+  name       String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  articles   Article[]
 
-  @@unique([name, platform])
-  @@index([platform])
+  @@unique([name])
 }
 
 model Article {
-  id               String    @id @default(cuid())
-  accountId        String
-  account          Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  title            String
-  url              String    @unique
-  publishTimestamp Int?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  account_id        String
+  account           Account   @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  title             String
+  url               String    @unique
+  publish_timestamp Int?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
 
-  @@index([accountId])
-  @@index([publishTimestamp])
+  @@index([account_id])
+  @@index([publish_timestamp])
 }

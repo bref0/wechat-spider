@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { logger } from '../logger/index.js';
-import type { WeChatAccount } from '../types/index.js';
+import { logger } from '../logger';
+import type { WeChatAccount } from '../types';
 
 export async function searchAccount(
   token: string,

@@ -1,9 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import path from 'path';
-import type { Article } from '../types/index.js';
+import type { Article } from '../types';
+import {logger} from "../logger";
 
 // 修复 Prisma 相对路径问题:将相对路径转换为绝对路径
-const dbUrl = process.env.DATABASE_URL || 'file:./data/wechat.db';
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  logger.error('DATABASE_URL 环境变量未设置');
+  process.exit(1);
+}
 const absoluteDbUrl = dbUrl.startsWith('file:./')
   ? `file:${path.resolve(process.cwd(), dbUrl.replace('file:', ''))}`
   : dbUrl;
@@ -24,16 +29,10 @@ process.on('beforeExit', async () => {
 export async function saveArticleToDatabase(article: Article): Promise<void> {
   // 1. 确保账号存在
   const account = await prisma.account.upsert({
-    where: {
-      name_platform: {
-        name: article.accountName,
-        platform: 'wechat',
-      },
-    },
+    where: {name: article.accountName},
     update: {},
     create: {
       name: article.accountName,
-      platform: 'wechat',
     },
   });
 
@@ -42,13 +41,13 @@ export async function saveArticleToDatabase(article: Article): Promise<void> {
     where: { url: article.url },
     update: {
       title: article.title,
-      publishTimestamp: article.publishTimestamp,
+      publish_timestamp: article.publishTimestamp,
     },
     create: {
-      accountId: account.id,
+      account_id: account.id,
       title: article.title,
       url: article.url,
-      publishTimestamp: article.publishTimestamp
+      publish_timestamp: article.publishTimestamp
     },
   });
 }

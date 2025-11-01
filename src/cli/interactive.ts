@@ -1,10 +1,10 @@
 import inquirer from 'inquirer';
-import { logger } from '../logger/index.js';
+import { logger } from '../logger';
 import { initConfig } from './init.js';
 import { WeChatLogin } from '../wechat/login.js';
 import { WeChatScraper } from '../wechat/scraper.js';
-import { loadConfig, resetConfigCache } from '../config/index.js';
-import { saveArticles } from '../storage/index.js';
+import { loadConfig, resetConfigCache } from '../config';
+import { saveArticles } from '../storage';
 
 /**
  * 主交互式菜单
