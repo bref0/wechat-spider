@@ -105,23 +105,3 @@ export async function getArticlesList(
     return [];
   }
 }
-
-export async function getArticleContent(
-  url: string,
-  cookie: string
-): Promise<string> {
-  try {
-    const response = await axios.get(url, {
-      headers: {
-        cookie,
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    logger.error(`获取文章内容失败: ${error}`);
-    return '';
-  }
-}

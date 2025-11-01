@@ -1,6 +1,5 @@
 import { WeChatLogin } from './login.js';
-import { searchAccount, getArticlesList, getArticleContent } from './api.js';
-import { parseArticleContent } from './parser.js';
+import { searchAccount, getArticlesList } from './api.js';
 import { logger } from '../logger/index.js';
 import { loadConfig } from '../config/index.js';
 import { filterExistingArticles } from '../storage/database.js';
@@ -32,7 +31,6 @@ export class WeChatScraper {
     // 只有在未指定 limit 和 startDate/endDate 时才使用默认 days
     const days = options.limit || options.startDate || options.endDate ? options.days : (options.days ?? config.scraper.days);
     const limit = options.limit;
-    const includeContent = options.includeContent ?? true;
 
     logger.info(`开始爬取公众号: ${accountName}`);
 
@@ -126,9 +124,7 @@ export class WeChatScraper {
           accountName: account.wpub_name,
           title: item.title,
           url: item.link,
-          publishTime: new Date(item.update_time * 1000),
           publishTimestamp: item.update_time,
-          digest: item.digest || '',
         };
 
         articles.push(article);
@@ -159,48 +155,17 @@ export class WeChatScraper {
     // 过滤已存在的文章 (如果启用 skipExisting)
     let filteredArticles = articles;
     if (options.skipExisting) {
-      const config = await loadConfig();
-      if (config.storage.mode === 'database' || config.storage.mode === 'both') {
-        logger.info('检查数据库中已存在的文章...');
-        const urls = articles.map((a) => a.url);
-        const existingUrls = await filterExistingArticles(urls);
+      logger.info('检查数据库中已存在的文章...');
+      const urls = articles.map((a) => a.url);
+      const existingUrls = await filterExistingArticles(urls);
 
-        if (existingUrls.length > 0) {
-          logger.info(`发现 ${existingUrls.length} 篇文章已存在,将跳过`);
-          const existingUrlSet = new Set(existingUrls);
-          filteredArticles = articles.filter((a) => !existingUrlSet.has(a.url));
-          logger.info(`剩余 ${filteredArticles.length} 篇新文章`);
-        } else {
-          logger.info('没有发现已存在的文章');
-        }
+      if (existingUrls.length > 0) {
+        logger.info(`发现 ${existingUrls.length} 篇文章已存在,将跳过`);
+        const existingUrlSet = new Set(existingUrls);
+        filteredArticles = articles.filter((a) => !existingUrlSet.has(a.url));
+        logger.info(`剩余 ${filteredArticles.length} 篇新文章`);
       } else {
-        logger.warn('--skip-existing 仅在 database 或 both 模式下有效');
-      }
-    }
-
-    // 获取文章内容
-    if (includeContent) {
-      logger.info('开始获取文章内容...');
-
-      for (let i = 0; i < filteredArticles.length; i++) {
-        const article = filteredArticles[i];
-        logger.info(`[${i + 1}/${filteredArticles.length}] ${article.title}`);
-
-        try {
-          const html = await getArticleContent(article.url, cookie);
-          const parsed = parseArticleContent(html);
-
-          article.content = parsed.markdown;
-          article.images = parsed.images;
-          article.videos = parsed.videos;
-
-          // 请求间隔
-          if (i < filteredArticles.length - 1) {
-            await new Promise((resolve) => setTimeout(resolve, 3000));
-          }
-        } catch (error) {
-          logger.error(`获取文章内容失败: ${error}`);
-        }
+        logger.info('没有发现已存在的文章');
       }
     }
 

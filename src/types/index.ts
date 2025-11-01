@@ -21,14 +21,3 @@ export interface WeChatAccount {
   wpub_name: string;
   wpub_fakid: string;
 }
-
-export interface MediaFile {
-  url: string;
-  type: 'image' | 'video';
-  localPath?: string;
-}
-
-export interface SaveOptions {
-  mode?: 'local' | 'database' | 'both';
-  downloadMedia?: boolean;
-}

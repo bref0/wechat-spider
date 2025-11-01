@@ -3,7 +3,6 @@ import { Command } from 'commander';
 import { WeChatLogin } from '../wechat/login.js';
 import { WeChatScraper } from '../wechat/scraper.js';
 import { saveArticles } from '../storage/index.js';
-import { exportAccountToCSV } from '../storage/export.js';
 import { logger } from '../logger/index.js';
 import { loadConfig, updateConfig } from '../config/index.js';
 import { searchAccount } from '../wechat/api.js';
@@ -81,7 +80,7 @@ program
 program
   .command('scrape <name>')
   .description('爬取单个公众号')
-  .option('--mode <mode>', '存储模式: local | database | both', 'local')
+  .option('--mode <mode>', '存储模式: database', 'database')
   .option('-p, --pages <number>', '最大页数', '10')
   .option('-d, --days <number>', '最近几天', '30')
   .option('-l, --limit <number>', '限制文章数量')
@@ -98,10 +97,6 @@ program
       // 临时覆盖配置
       if (options.mode) {
         config.storage.mode = options.mode;
-      }
-      if (options.media === false) {
-        config.storage.local.downloadMedia = false;
-        config.storage.database.downloadMedia = false;
       }
 
       // 更新配置缓存
@@ -137,7 +132,7 @@ program
 program
   .command('batch')
   .description('批量爬取配置文件中的公众号列表')
-  .option('--mode <mode>', '存储模式: local | database | both')
+  .option('--mode <mode>', '存储模式: database')
   .option('-p, --pages <number>', '最大页数')
   .option('-d, --days <number>', '最近几天')
   .option('-l, --limit <number>', '每个公众号限制文章数量')
@@ -215,25 +210,6 @@ program
       logger.info(`\n✓ 批量爬取完成!`);
     } catch (error) {
       logger.error(`批量爬取失败: ${error}`);
-      process.exit(1);
-    }
-  });
-
-// 导出 CSV
-program
-  .command('export <accountName>')
-  .description('从数据库导出文章为 CSV')
-  .option('-o, --output <path>', '输出文件路径')
-  .action(async (accountName: string, options: any) => {
-    try {
-      const outputPath = options.output || `./${accountName}.csv`;
-      const count = await exportAccountToCSV(accountName, outputPath);
-
-      if (count > 0) {
-        logger.info(`✓ 导出完成: ${outputPath}`);
-      }
-    } catch (error) {
-      logger.error(`导出失败: ${error}`);
       process.exit(1);
     }
   });

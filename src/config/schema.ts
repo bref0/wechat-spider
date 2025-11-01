@@ -2,16 +2,7 @@ import { z } from 'zod';
 
 export const configSchema = z.object({
   storage: z.object({
-    mode: z.enum(['local', 'database', 'both']).default('local'),
-
-    local: z.object({
-      baseDir: z.string().default('./output'),
-      folderNameTemplate: z.string().default('{title}_{date}'),
-      downloadMedia: z.boolean().default(true),
-      saveAs: z.enum(['markdown', 'html']).default('markdown'),
-      includeMetadata: z.boolean().default(true),
-      sanitizeFolderName: z.boolean().default(true),
-    }),
+    mode: z.enum(['database']).default('database'),
 
     database: z.object({
       type: z.enum(['sqlite', 'mysql']).default('sqlite'),
@@ -22,33 +13,10 @@ export const configSchema = z.object({
     }),
   }),
 
-  media: z.object({
-    download: z.object({
-      images: z.boolean().default(true),
-      videos: z.boolean().default(true),
-      timeout: z.number().default(30000),
-      retryTimes: z.number().default(3),
-      concurrent: z.number().default(5),
-    }),
-    naming: z.object({
-      useOriginalName: z.boolean().default(false),
-      pattern: z.string().default('{type}-{index}.{ext}'),
-    }),
-  }),
-
   scraper: z.object({
     requestInterval: z.number().default(10),
     maxPages: z.number().default(10),
     days: z.number().default(30),
-  }),
-
-  export: z.object({
-    csv: z.object({
-      enabled: z.boolean().default(true),
-      encoding: z.string().default('utf8'),
-      includeContent: z.boolean().default(true),
-      includeMediaLinks: z.boolean().default(true),
-    }),
   }),
 
   // 批量爬取配置

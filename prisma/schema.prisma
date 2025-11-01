@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -11,7 +11,6 @@ model Account {
   id        String    @id @default(cuid())
   name      String
   platform  String    @default("wechat")
-  accountId String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   articles  Article[]
@@ -26,15 +25,10 @@ model Article {
   account          Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
   title            String
   url              String    @unique
-  publishTime      DateTime?
   publishTimestamp Int?
-  content          String?
-  summary          String?
-  digest           String?
-  media            String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
-  @@index([accountId, publishTime])
+  @@index([accountId])
   @@index([publishTimestamp])
 }

@@ -31,10 +31,8 @@ export async function loadConfig(): Promise<Config> {
   } else {
     logger.info('未找到配置文件,使用默认配置');
   }
-
   // 直接解析用户配置,Zod 会自动填充默认值
   cachedConfig = configSchema.parse(userConfig);
-
   // 注意: 不再从环境变量覆盖配置,请在 config.json 中设置
   // 环境变量仅用于数据库连接、日志级别等敏感信息
 
