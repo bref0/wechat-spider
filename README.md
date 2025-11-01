@@ -193,4 +193,4 @@ MIT
 
 ## 🙏 致谢
 
-本项目是 [WeMediaSpider](https://github.com/seanzhang-zhichen/WeMediaSpider) Python 版本的 Node.js 重构版本。
+本项目是 [wechat-spider](https://github.com/xiaofeiwuuu/wechat-spider) 精简版本 只保留了登陆、爬取部分数据到MySQL的功能。

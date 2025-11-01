@@ -1,15 +1,6 @@
 import { z } from 'zod';
 
 export const configSchema = z.object({
-  storage: z.object({
-    mode: z.enum(['database']),
-
-    database: z.object({
-      type: z.enum(['mysql']),
-      url: z.string(),
-    }),
-  }),
-
   scraper: z.object({
     requestInterval: z.number(),
     maxPages: z.number(),

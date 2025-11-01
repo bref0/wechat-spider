@@ -23,7 +23,6 @@ process.on('beforeExit', async () => {
 });
 
 export async function saveArticleToDatabase(article: Article): Promise<void> {
-
   // 转换为北京时间
   const now = new Date();
   const beijingTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);

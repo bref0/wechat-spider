@@ -1,16 +1,4 @@
 {
-  // ==================== 存储配置 ====================
-  // 存储模式: 'database' (数据库)
-  "storage": {
-    "mode": "database",
-
-    // 数据库存储配置 (mode = 'database' 或 'both' 时生效)
-    "database": {
-      "type": "mysql",                       // 数据库类型: 'sqlite' | 'mysql' | 'postgresql'
-      "url": "",                         // 数据库连接字符串
-    }
-  },
-
   // ==================== 爬虫配置 ====================
   "scraper": {
     "requestInterval": 10,              // 请求间隔 (秒) - 建议 10-15 秒
