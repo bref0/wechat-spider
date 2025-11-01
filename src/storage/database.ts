@@ -5,8 +5,8 @@ import {logger} from "../logger";
 // 修复 Prisma 相对路径问题:将相对路径转换为绝对路径
 const dbUrl = process.env.DATABASE_URL;
 if (!dbUrl) {
-  logger.error('DATABASE_URL 环境变量未设置');
-  process.exit(1);
+  logger.error('请检查 .env 文件中的 DATABASE_URL 配置');
+  process.exit(0);
 }
 logger.info(dbUrl)
 

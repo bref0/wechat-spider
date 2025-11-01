@@ -24,6 +24,7 @@ export async function startInteractive() {
           message: '请选择操作 (输入数字):',
           choices: [
             { name: '🔐 登录微信公众平台', value: 'login' },
+            { name: '📄 爬取单个公众号', value: 'scrape' },
             { name: '📚 批量爬取多个公众号', value: 'batch' },
             { name: '❌ 退出', value: 'exit' },
           ],
@@ -41,6 +42,9 @@ export async function startInteractive() {
       switch (action) {
         case 'login':
           await handleLogin();
+          break;
+        case 'scrape':
+          await handleScrape();
           break;
         case 'batch':
           await handleBatch();
@@ -70,6 +74,51 @@ async function handleLogin() {
   const login = new WeChatLogin();
   await login.login();
   logger.info('\n✅ 登录成功!');
+
+  // 等待所有异步日志输出完成,避免覆盖主菜单
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+}
+
+/**
+ * 处理单个公众号爬取
+ */
+async function handleScrape() {
+  let options: any = {};
+
+  // 输入公众号名称
+  const { accountName } = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'accountName',
+      message: '请输入公众号名称:',
+      validate: (input) => {
+        if (!input || !input.trim()) {
+          return '公众号名称不能为空';
+        }
+        return true;
+      },
+    },
+  ]);
+
+  // 开始爬取
+  console.log(`\n开始爬取公众号: ${accountName}`);
+
+  const scraper = new WeChatScraper();
+  const articles = await scraper.scrapeAccount(accountName.trim(), {
+    maxPages: options.pages,
+    limit: options.limit,
+    days: options.days,
+    startDate: options.startDate,
+    endDate: options.endDate,
+    skipExisting: options.skipExisting,
+  });
+
+  console.log(`\n✅ 共爬取 ${articles.length} 篇文章`);
+
+  // 保存文章
+  await saveArticles(articles);
+
+  console.log('\n✅ 爬取完成!');
 
   // 等待所有异步日志输出完成,避免覆盖主菜单
   await new Promise((resolve) => setTimeout(resolve, 1000));
